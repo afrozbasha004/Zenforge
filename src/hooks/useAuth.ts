@@ -33,10 +33,13 @@ export function useAuth() {
         case "SIGNED_IN": {
           setUser(currentUser);
           setLoading(false);
+          setInitialized(true);
           break;
         }
         case "SIGNED_OUT": {
-          reset();
+          setUser(null);
+          setLoading(false);
+          setInitialized(true);
           break;
         }
         case "TOKEN_REFRESHED": {
