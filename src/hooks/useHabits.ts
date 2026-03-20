@@ -1,78 +1,31 @@
-"use client";
+const fetchHabits = useCallback(async () => {
+  if (!isInitialized) return;
 
-import { useEffect, useCallback, useRef, useState } from "react";
-import { createClient }  from "@/lib/supabase/client";
-import { useAuthStore }  from "@/stores/authStore";
-
-export interface Habit {
-  id:         string;
-  user_id:    string;
-  title:      string;
-  completed:  boolean;
-  created_at: string;
-}
-
-interface UseHabitsReturn {
-  habits:   Habit[];
-  loading:  boolean;
-  error:    string | null;
-  refetch:  () => Promise<void>;
-}
-
-export function useHabits(): UseHabitsReturn {
-  const user          = useAuthStore((s) => s.user);
-  const isInitialized = useAuthStore((s) => s.isInitialized);
-
-  const [habits,  setHabits]  = useState<Habit[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error,   setError]   = useState<string | null>(null);
-
-  const isMounted = useRef(true);
-
-  const fetchHabits = useCallback(async () => {
-    if (!user || !isInitialized) return;
-
-    setLoading(true);
-    setError(null);
-
-    const supabase = createClient();
-
-    const { data, error: fetchError } = await supabase
-      .from("habits")
-      .select("id, user_id, title, completed, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (!isMounted.current) return;
-
-    if (fetchError) {
-      setError(fetchError.message);
-      setLoading(false);
-      return;
-    }
-
-    setHabits(data ?? []);
+  if (!user) {
+    setHabits([]);
     setLoading(false);
-  }, [user, isInitialized]);
+    return;
+  }
 
-  useEffect(() => {
-    isMounted.current = true;
+  setLoading(true);
+  setError(null);
 
-    if (!isInitialized) return;
+  const supabase = createClient();
 
-    if (!user) {
-      setHabits([]);
-      setLoading(false);
-      return;
-    }
+  const { data, error: fetchError } = await supabase
+    .from("habits")
+    .select("id, user_id, title, completed, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
 
-    fetchHabits();
+  if (!isMounted.current) return;
 
-    return () => {
-      isMounted.current = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, isInitialized]);
+  if (fetchError) {
+    setError(fetchError.message);
+    setLoading(false);
+    return;
+  }
 
-  return { habits, loading, error, refetch: fetchHabits };
-}
+  setHabits(data ?? []);
+  setLoading(false);
+}, [user, isInitialized]);
