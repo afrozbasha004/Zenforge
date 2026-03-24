@@ -63,11 +63,7 @@ export function useHabits(): UseHabitsReturn {
 
   useEffect(() => {
     isMounted.current = true;
-    console.log("HABITS DEBUG:",{
-      user,
-      isInitialized,
-      loading,
-    });
+    alert("RUNNING");
 
     if (!isInitialized) return;
 
