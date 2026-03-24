@@ -41,37 +41,43 @@ export function useUserProfile(): UseUserProfileReturn {
   const reset      = useProfileStore((s) => s.reset);
 
   const isMounted = useRef(true);
+const fetchProfile = useCallback(async () => {
+  if (!isInitialized) return;
 
-  const fetchProfile = useCallback(async () => {
-    if (!user || !isInitialized) return;
-
-    setLoading(true);
-    setError(null);
-
-    const supabase = createClient();
-
-    const { data, error: fetchError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (!isMounted.current) return;
-
-    if (fetchError) {
-      setError(fetchError.message);
-      setLoading(false);
-      return;
-    }
-    if (!data){
-      setProfile(null);
-      setLoading(false);
-      return;
-    }
-
-    setProfile(data);
+  if (!user) {
+    setProfile(null);
     setLoading(false);
-  }, [user, isInitialized, setProfile, setLoading, setError]);
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+
+  const supabase = createClient();
+
+  const { data, error: fetchError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!isMounted.current) return;
+
+  if (fetchError) {
+    setError(fetchError.message);
+    setLoading(false);
+    return;
+  }
+
+  if (!data) {
+    setProfile(null);
+    setLoading(false);
+    return;
+  }
+
+  setProfile(data);
+  setLoading(false);
+}, [user, isInitialized, setProfile, setLoading, setError]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -79,7 +85,8 @@ export function useUserProfile(): UseUserProfileReturn {
     if (!isInitialized) return;
 
     if (!user) {
-      reset();
+      setProfile(null);
+      setLoading(false);
       return;
     }
 
