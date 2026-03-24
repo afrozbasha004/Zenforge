@@ -54,7 +54,7 @@ export function useUserProfile(): UseUserProfileReturn {
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .maybesingle();
+      .maybeSingle();
 
     if (!isMounted.current) return;
 
