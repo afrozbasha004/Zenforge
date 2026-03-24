@@ -31,6 +31,7 @@ export function useAuth() {
           break;
         }
         case "SIGNED_IN": {
+          console.log("AUTH INTITIALIZED");
           setUser(currentUser);
           setLoading(false);
           setInitialized(true);
