@@ -64,7 +64,7 @@ export function useUserProfile(): UseUserProfileReturn {
       return;
     }
     if (!data){
-      setprofile(null);
+      setProfile(null);
       setLoading(false);
       return;
     }
