@@ -54,12 +54,17 @@ export function useUserProfile(): UseUserProfileReturn {
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .single();
+      .maybesingle();
 
     if (!isMounted.current) return;
 
     if (fetchError) {
       setError(fetchError.message);
+      setLoading(false);
+      return;
+    }
+    if (!data){
+      setprofile(null);
       setLoading(false);
       return;
     }
